@@ -20,7 +20,7 @@
             <a class="navbar-brand" href="{{ route('super-admin.dashboard') }}">
                 <i class="fas fa-gas-pump me-2"></i>
                 <strong>SMART PUMP</strong>
-                <small class="ms-2">Super Admin</small>
+
             </a>
 
             <div class="navbar-nav ms-auto">
