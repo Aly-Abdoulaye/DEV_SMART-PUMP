@@ -21,6 +21,7 @@ use App\Http\Controllers\SuperAdmin\BackupController;
 use App\Http\Controllers\SuperAdmin\CompanySettingController;
 use App\Livewire\SuperAdmin\SubscriptionDashboard;
 use App\Livewire\SuperAdmin\UserSearch;
+use App\Http\Controllers\Admin\TankController;
 
 // Authentification Breeze
 require __DIR__.'/auth.php';
@@ -115,11 +116,23 @@ Route::middleware(['auth'])->group(function () {
 });
 
     // Admin Routes
-    Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
-        Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
-        Route::resource('stations', StationController::class);
-    });
+// routes/web.php - dans le groupe admin
+Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
+    Route::resource('stations', StationController::class);
 
+    // Route supplémentaire pour changer le statut
+    Route::post('stations/{station}/toggle-status', [StationController::class, 'toggleStatus'])
+        ->name('stations.toggle-status');
+        Route::resource('tanks', TankController::class);
+
+    // Routes supplémentaires pour les cuves
+    Route::post('tanks/{tank}/adjust-volume', [TankController::class, 'adjustVolume'])
+        ->name('tanks.adjust-volume');
+
+    Route::post('tanks/{tank}/toggle-status', [TankController::class, 'toggleStatus'])
+        ->name('tanks.toggle-status');
+});
     // Manager Routes
     Route::middleware(['role:manager'])->prefix('manager')->name('manager.')->group(function () {
         Route::get('/dashboard', ManagerDashboardController::class)->name('dashboard');
