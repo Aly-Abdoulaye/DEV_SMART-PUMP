@@ -44,4 +44,8 @@ class Tank extends Model
     {
         return ($this->current_volume / $this->capacity) * 100;
     }
+    public function scopeActive($query)
+{
+    return $query->where('is_active', true);
+}
 }

@@ -296,7 +296,7 @@
                 <div class="card-body">
                     <div class="row g-2">
                         <div class="col-md-6">
-                            <a href="#" class="btn btn-outline-primary w-100">
+                            <a href="{{ route('admin.stations.pumps.index', $station) }}" class="btn btn-outline-primary w-100">
                                 <i class="fas fa-plus me-1"></i> Ajouter Pompe
                             </a>
                         </div>
