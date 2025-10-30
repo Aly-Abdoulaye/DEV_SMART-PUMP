@@ -22,6 +22,7 @@ use App\Http\Controllers\SuperAdmin\CompanySettingController;
 use App\Livewire\SuperAdmin\SubscriptionDashboard;
 use App\Livewire\SuperAdmin\UserSearch;
 use App\Http\Controllers\Admin\TankController;
+use App\Http\Controllers\Admin\PumpController;
 
 // Authentification Breeze
 require __DIR__.'/auth.php';
@@ -115,23 +116,40 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/backup/cleanup', [BackupController::class, 'cleanup'])->name('backup.cleanup');
 });
 
-    // Admin Routes
-// routes/web.php - dans le groupe admin
+   // Routes Admin
 Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
+
+    // Dashboard
     Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');
+
+    // Stations (routes principales)
     Route::resource('stations', StationController::class);
 
-    // Route supplémentaire pour changer le statut
+    // Routes supplémentaires pour les stations
     Route::post('stations/{station}/toggle-status', [StationController::class, 'toggleStatus'])
         ->name('stations.toggle-status');
+
+    // Routes pour les cuves
+    Route::prefix('stations/{station}')->name('stations.')->group(function () {
         Route::resource('tanks', TankController::class);
 
-    // Routes supplémentaires pour les cuves
-    Route::post('tanks/{tank}/adjust-volume', [TankController::class, 'adjustVolume'])
-        ->name('tanks.adjust-volume');
+        Route::post('tanks/{tank}/adjust-volume', [TankController::class, 'adjustVolume'])
+            ->name('tanks.adjust-volume');
 
-    Route::post('tanks/{tank}/toggle-status', [TankController::class, 'toggleStatus'])
-        ->name('tanks.toggle-status');
+        Route::post('tanks/{tank}/toggle-status', [TankController::class, 'toggleStatus'])
+            ->name('tanks.toggle-status');
+    });
+
+    // Routes pour les pompes - IMPORTANT: À AJOUTER ICI
+    Route::prefix('stations/{station}')->name('stations.')->group(function () {
+        Route::resource('pumps', PumpController::class);
+
+        Route::post('pumps/{pump}/update-index', [PumpController::class, 'updateIndex'])
+            ->name('pumps.update-index');
+
+        Route::post('pumps/{pump}/update-status', [PumpController::class, 'updateStatus'])
+            ->name('pumps.update-status');
+    });
 });
     // Manager Routes
     Route::middleware(['role:manager'])->prefix('manager')->name('manager.')->group(function () {

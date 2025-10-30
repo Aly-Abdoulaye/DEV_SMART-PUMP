@@ -40,7 +40,7 @@ class TankController extends Controller
 
         $fuelTypes = ['Gazole', 'SP95', 'SP98', 'GPL', 'Super'];
 
-        return view('admin.tanks.create', compact('station', 'fuelTypes'));
+        return view('admin.stations.tanks.create', compact('station', 'fuelTypes'));
     }
 
     /**
@@ -83,7 +83,7 @@ class TankController extends Controller
         // Historique des mouvements (à implémenter plus tard)
         $recentMovements = [];
 
-        return view('admin.tanks.show', compact('station', 'tank', 'recentMovements'));
+        return view('admin.stations.tanks.show', compact('station', 'tank', 'recentMovements'));
     }
 
     /**
@@ -95,7 +95,7 @@ class TankController extends Controller
 
         $fuelTypes = ['Gazole', 'SP95', 'SP98', 'GPL', 'Super'];
 
-        return view('admin.tanks.edit', compact('station', 'tank', 'fuelTypes'));
+        return view('admin.stations.tanks.edit', compact('station', 'tank', 'fuelTypes'));
     }
 
     /**
