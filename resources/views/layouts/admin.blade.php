@@ -73,7 +73,7 @@
                         <!-- Gestion des Utilisateurs -->
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}"
-                               href="#">
+                               href="{{ route('admin.users.index') }}">
                                 <i class="fas fa-users me-2"></i>
                                 Gestion des Utilisateurs
                             </a>

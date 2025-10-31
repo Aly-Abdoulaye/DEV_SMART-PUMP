@@ -23,6 +23,8 @@ use App\Livewire\SuperAdmin\SubscriptionDashboard;
 use App\Livewire\SuperAdmin\UserSearch;
 use App\Http\Controllers\Admin\TankController;
 use App\Http\Controllers\Admin\PumpController;
+use App\Http\Controllers\Admin\CompanyUserController;
+
 
 // Authentification Breeze
 require __DIR__.'/auth.php';
@@ -118,6 +120,16 @@ Route::middleware(['auth'])->group(function () {
 
    // Routes Admin
 Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(function () {
+
+        // Gestion des utilisateurs - CORRECTION ICI
+    Route::get('/users', [CompanyUserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [CompanyUserController::class, 'create'])->name('users.create');
+    Route::post('/users', [CompanyUserController::class, 'store'])->name('users.store');
+    Route::get('/users/{user}/edit', [CompanyUserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [CompanyUserController::class, 'update'])->name('users.update');
+    Route::post('/users/{user}/toggle-status', [CompanyUserController::class, 'toggleStatus'])->name('users.toggle-status');
+    Route::post('/users/{user}/reset-password', [CompanyUserController::class, 'resetPassword'])->name('users.reset-password');
+    Route::delete('/users/{user}', [CompanyUserController::class, 'destroy'])->name('users.destroy');
 
     // Dashboard
     Route::get('/dashboard', AdminDashboardController::class)->name('dashboard');

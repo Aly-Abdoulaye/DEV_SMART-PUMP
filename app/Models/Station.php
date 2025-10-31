@@ -72,4 +72,9 @@ class Station extends Model
     {
         return $this->hasMany(User::class)->where('role', 'technician');
     }
+
+    public function scopeActive($query)
+{
+    return $query->where('is_active', true);
+}
 }
