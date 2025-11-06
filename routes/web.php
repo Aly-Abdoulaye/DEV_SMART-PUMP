@@ -5,10 +5,9 @@ use App\Http\Controllers\SuperAdmin\CompanyController;
 use App\Http\Controllers\SuperAdmin\DashboardController as SuperAdminDashboardController;
 use App\Http\Controllers\Admin\StationController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
-use App\Http\Controllers\Manager\DashboardController as ManagerDashboardController;
 use App\Http\Controllers\Manager\SaleController as ManagerSaleController;
-use App\Http\Controllers\Employee\DashboardController as EmployeeDashboardController;
-use App\Http\Controllers\Technician\DashboardController as TechnicianDashboardController;
+use App\Http\Controllers\Employee\EmployeeDashboardController as EmployeeDashboardController;
+use App\Http\Controllers\Technician\TechnicianDashboardController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SuperAdmin\UserController;
 use App\Http\Controllers\SuperAdmin\SubscriptionController;
@@ -24,6 +23,7 @@ use App\Livewire\SuperAdmin\UserSearch;
 use App\Http\Controllers\Admin\TankController;
 use App\Http\Controllers\Admin\PumpController;
 use App\Http\Controllers\Admin\CompanyUserController;
+use App\Http\Controllers\Manager\ManagerDashboardController;
 
 
 // Authentification Breeze
@@ -165,17 +165,18 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
 });
     // Manager Routes
     Route::middleware(['role:manager'])->prefix('manager')->name('manager.')->group(function () {
-        Route::get('/dashboard', ManagerDashboardController::class)->name('dashboard');
-        Route::resource('sales', ManagerSaleController::class)->only(['index', 'create', 'store']);
-    });
-
+    Route::get('/dashboard', ManagerDashboardController::class)->name('dashboard');
+    // Ajoutez les autres routes ici au fur et à mesure
+});
     // Employee Routes
     Route::middleware(['role:employee'])->prefix('employee')->name('employee.')->group(function () {
-        Route::get('/dashboard', EmployeeDashboardController::class)->name('dashboard');
-    });
+    Route::get('/dashboard', EmployeeDashboardController::class)->name('dashboard');
+    // Ajouter d'autres routes employé ici...
+});
 
     // Technician Routes
     Route::middleware(['role:technician'])->prefix('technician')->name('technician.')->group(function () {
-        Route::get('/dashboard', TechnicianDashboardController::class)->name('dashboard');
-    });
+    Route::get('/dashboard', TechnicianDashboardController::class)->name('dashboard');
+    // Ajouter d'autres routes technicien ici...
+});
 });
