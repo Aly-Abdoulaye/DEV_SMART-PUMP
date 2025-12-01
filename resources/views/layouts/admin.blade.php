@@ -83,7 +83,7 @@
                         <!-- Gestion du Carburant -->
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('fuels.*') ? 'active' : '' }}"
-                               href="#">
+                               href="{{ route('admin.fuels.index') }}">
                                 <i class="fas fa-oil-can me-2"></i>
                                 Gestion du Carburant
                             </a>
@@ -210,7 +210,7 @@
     <!-- Scripts -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
 
     <script>
         // Auto-dismiss alerts after 5 seconds
