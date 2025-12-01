@@ -172,7 +172,7 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
         Route::get('/dashboard', [FuelDashboardController::class, 'index'])->name('dashboard');
         
         // ✅ CORRECTION - Route analytics simple
-    Route::get('/analytics', [FuelDashboardController::class, 'analytics'])->name('analytics');
+        Route::get('/analytics', [FuelDashboardController::class, 'analytics'])->name('analytics');
         // Données API pour graphiques
         Route::get('/dashboard/chart-data', [FuelDashboardController::class, 'chartData'])->name('dashboard.chart-data');
         Route::get('/dashboard/alerts', [FuelDashboardController::class, 'alerts'])->name('dashboard.alerts');
@@ -214,6 +214,31 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
             
             // Export Excel de l'historique des prix de tous les carburants  
             Route::get('/fuels/export/price-history/excel', [FuelController::class, 'exportAllPriceHistory'])->name('fuels.export-price-history');
+        });
+         // ✅ SECTION : VENTES (Sales) - Mettre à jour les noms
+        Route::prefix('sales')->name('sales.')->group(function () {
+            // Liste des ventes avec filtres
+            Route::get('/', [App\Http\Controllers\Admin\SaleController::class, 'index'])->name('index');
+            
+            // Détails d'une vente
+            Route::get('/{sale}', [App\Http\Controllers\Admin\SaleController::class, 'show'])->name('show');
+            
+            // Annuler une vente
+            Route::post('/{sale}/cancel', [App\Http\Controllers\Admin\SaleController::class, 'cancel'])->name('cancel');
+            
+            // Ticket/reçu
+            Route::get('/{sale}/ticket', [App\Http\Controllers\Admin\SaleController::class, 'ticket'])->name('ticket');
+            
+            // Exports
+            Route::get('/export/excel', [App\Http\Controllers\Admin\SaleController::class, 'exportExcel'])->name('export.excel');
+            Route::get('/export/pdf', [App\Http\Controllers\Admin\SaleController::class, 'exportPdf'])->name('export.pdf');
+            
+            // Rapports
+            Route::get('/reports/daily', [App\Http\Controllers\Admin\SaleController::class, 'exportDailyReport'])->name('reports.daily');
+            Route::get('/reports/monthly', [App\Http\Controllers\Admin\SaleController::class, 'exportMonthlyReport'])->name('reports.monthly');
+            
+            // Statistiques
+            Route::get('/statistics', [App\Http\Controllers\Admin\SaleController::class, 'statistics'])->name('statistics');
         });
     
 });

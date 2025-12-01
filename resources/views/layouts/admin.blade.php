@@ -92,7 +92,7 @@
                         <!-- Ventes et Transactions -->
                         <li class="nav-item">
                             <a class="nav-link {{ request()->routeIs('admin.sales.*') ? 'active' : '' }}"
-                               href="#">
+                               href="{{ route('admin.sales.index') }}">
                                 <i class="fas fa-cash-register me-2"></i>
                                 Ventes et Transactions
                             </a>
