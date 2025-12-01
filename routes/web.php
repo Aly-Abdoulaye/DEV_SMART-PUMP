@@ -23,6 +23,8 @@ use App\Livewire\SuperAdmin\UserSearch;
 use App\Http\Controllers\Admin\TankController;
 use App\Http\Controllers\Admin\PumpController;
 use App\Http\Controllers\Admin\CompanyUserController;
+use App\Http\Controllers\Admin\FuelController;
+use App\Http\Controllers\Admin\FuelDashboardController;
 use App\Http\Controllers\Manager\ManagerDashboardController;
 
 
@@ -162,6 +164,58 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
         Route::post('pumps/{pump}/update-status', [PumpController::class, 'updateStatus'])
             ->name('pumps.update-status');
     });
+    // Tableau de bord carburants
+   // ✅ SECTION CORRIGÉE : Routes Fuel
+    Route::prefix('fuels')->name('fuels.')->group(function () {
+        
+        // Dashboard principal
+        Route::get('/dashboard', [FuelDashboardController::class, 'index'])->name('dashboard');
+        
+        // ✅ CORRECTION - Route analytics simple
+    Route::get('/analytics', [FuelDashboardController::class, 'analytics'])->name('analytics');
+        // Données API pour graphiques
+        Route::get('/dashboard/chart-data', [FuelDashboardController::class, 'chartData'])->name('dashboard.chart-data');
+        Route::get('/dashboard/alerts', [FuelDashboardController::class, 'alerts'])->name('dashboard.alerts');
+        
+        // Export PDF du dashboard
+        Route::get('/dashboard/export-pdf', [FuelDashboardController::class, 'exportPdf'])->name('dashboard.export-pdf');
+        
+        // CRUD complet des carburants
+        Route::get('/', [FuelController::class, 'index'])->name('index');
+        Route::get('/create', [FuelController::class, 'create'])->name('create');
+        Route::post('/', [FuelController::class, 'store'])->name('store');
+        Route::get('/{fuel}', [FuelController::class, 'show'])->name('show');
+        Route::get('/{fuel}/edit', [FuelController::class, 'edit'])->name('edit');
+        Route::put('/{fuel}', [FuelController::class, 'update'])->name('update');
+        Route::delete('/{fuel}', [FuelController::class, 'destroy'])->name('destroy');
+
+        // Actions supplémentaires
+        Route::post('/{fuel}/update-price', [FuelController::class, 'updatePrice'])->name('update-price');
+        Route::post('/{fuel}/toggle-status', [FuelController::class, 'toggleStatus'])->name('toggle-status');
+
+        // ✅ Routes d'export pour les carburants
+         Route::get('/{fuel}/export/pdf', [FuelController::class, 'exportPriceHistoryPdf'])->name('export.pdf');
+        Route::get('/{fuel}/export/excel', [FuelController::class, 'exportPriceHistory'])->name('export.excel');
+
+            // Si vous avez besoin d'un export général des historiques de prix (tous carburants)
+            Route::get('/export/price-history', [FuelController::class, 'exportAllPriceHistory'])->name('export.price-history');
+                });
+                Route::get('/fuels/{fuel}/pdf/price-history', [FuelController::class, 'exportPriceHistoryPdf'])
+        ->name('fuels.pdf.price-history');
+        // Routes d'export pour l'index (tous les carburants)
+        Route::prefix('admin')->name('admin.')->group(function () {
+            // ... vos autres routes admin
+            
+            // Export Excel de tous les carburants
+            Route::get('/fuels/export/excel', [FuelController::class, 'exportAllFuels'])->name('fuels.export');
+            
+            // Export PDF de l'historique des prix de tous les carburants
+            Route::get('/fuels/export/price-history/pdf', [FuelController::class, 'exportAllPriceHistoryPdf'])->name('fuels.export-price-history-pdf');
+            
+            // Export Excel de l'historique des prix de tous les carburants  
+            Route::get('/fuels/export/price-history/excel', [FuelController::class, 'exportAllPriceHistory'])->name('fuels.export-price-history');
+        });
+    
 });
     // Manager Routes
     Route::middleware(['role:manager'])->prefix('manager')->name('manager.')->group(function () {

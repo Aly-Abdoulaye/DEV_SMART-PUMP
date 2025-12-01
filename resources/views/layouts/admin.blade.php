@@ -9,7 +9,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-
+    <!-- DataTables CSS -->
+        <link href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap4.min.css" rel="stylesheet">
     @stack('styles')
     @livewireStyles
 </head>
@@ -81,7 +82,7 @@
 
                         <!-- Gestion du Carburant -->
                         <li class="nav-item">
-                            <a class="nav-link {{ request()->routeIs('admin.fuel.*') ? 'active' : '' }}"
+                            <a class="nav-link {{ request()->routeIs('fuels.*') ? 'active' : '' }}"
                                href="#">
                                 <i class="fas fa-oil-can me-2"></i>
                                 Gestion du Carburant
@@ -207,8 +208,9 @@
     </div>
 
     <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
 
     <script>
         // Auto-dismiss alerts after 5 seconds
