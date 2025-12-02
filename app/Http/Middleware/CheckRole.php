@@ -4,16 +4,15 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckRole
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-     public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string $role): Response
     {
         $user = $request->user();
 
@@ -21,16 +20,28 @@ class CheckRole
             return redirect()->route('login')->with('error', 'Veuillez vous connecter.');
         }
 
-        // 🔥 CORRECTION : Normaliser le rôle demandé
-        // Convertir super_admin → super-admin
-        $normalizedRole = $this->normalizeRoleSlug($role);
+        // 🔥 CORRECTION : Définir $userRole
+        $userRole = $user->role;
 
-        if ($user->hasRole($normalizedRole)) {
+        // 1. Accepter à la fois 'employee' et 'employe'
+        if (($role === 'employe' && $userRole === 'employee') || 
+            ($role === 'employee' && $userRole === 'employe')) {
             return $next($request);
         }
 
-        $userRole = $user->normalized_role_slug ?? 'non défini';
-        abort(403, "Accès refusé. Rôle '{$normalizedRole}' requis. Votre rôle: '{$userRole}'");
+        // 2. Si l'utilisateur a une méthode hasRole (package spatie/permission)
+        if (method_exists($user, 'hasRole')) {
+            $normalizedRole = $this->normalizeRoleSlug($role);
+            if ($user->hasRole($normalizedRole)) {
+                return $next($request);
+            }
+        }
+        // 3. Sinon, vérifier directement l'attribut role
+        else if ($user->role === $role) {
+            return $next($request);
+        }
+
+        abort(403, "Accès refusé. Rôle '{$role}' requis. Votre rôle: '{$userRole}'");
     }
 
     /**
@@ -42,10 +53,10 @@ class CheckRole
             'super_admin' => 'super-admin',
             'company_admin' => 'company-admin',
             'station_manager' => 'station-manager',
-            // Les autres rôles sans variation
-            'admin' => 'company-admin',        // admin → company-admin
-            'manager' => 'station-manager',    // manager → station-manager
+            'admin' => 'company-admin',
+            'manager' => 'station-manager',
             'employee' => 'employee',
+            'employe' => 'employee',  // Ajouté
             'technician' => 'technician',
         ];
 
@@ -53,25 +64,33 @@ class CheckRole
     }
 
     /**
-     * Vérifier si l'utilisateur a le rôle requis
+     * Vérifier si l'utilisateur a le rôle requis (version simplifiée)
      */
     private function checkUserRole($user, string $role): bool
     {
-        $roleMap = [
-            'super_admin' => 'isSuperAdmin',
-            'admin' => 'isAdmin',
-            'manager' => 'isManager',
-            'employee' => 'isEmployee',
-            'technician' => 'isTechnician',
+        // Normaliser le rôle pour la comparaison
+        $normalizedRole = $this->normalizeRole($role);
+        $normalizedUserRole = $this->normalizeRole($user->role);
+        
+        return $normalizedRole === $normalizedUserRole;
+    }
+
+    /**
+     * Normaliser les rôles (pour accepter les deux orthographes)
+     */
+    private function normalizeRole(string $role): string
+    {
+        // Convertir en minuscule et supprimer les espaces
+        $role = strtolower(trim($role));
+        
+        // Mapping des variantes
+        $variants = [
+            'employee' => 'employee',  // Version anglaise
+            'employe' => 'employee',   // Version française → anglaise
+            'employé' => 'employee',   // Avec accent
+            'employée' => 'employee',  // Féminin
         ];
-
-        // Vérifier si le rôle demandé existe dans le mapping
-        if (isset($roleMap[$role])) {
-            $method = $roleMap[$role];
-            return $user->$method();
-        }
-
-        // Si le rôle n'existe pas dans le mapping, refuser l'accès
-        return false;
+        
+        return $variants[$role] ?? $role;
     }
 }

@@ -1,170 +1,356 @@
+{{-- resources/views/employee/dashboard.blade.php --}}
 @extends('layouts.employee')
 
+@section('title', 'Tableau de Bord - Employé')
+
 @section('content')
-<!-- Message de Bienvenue -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card sale-card">
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <h4 class="text-white">Bonjour, {{ $user->name }} ! 👋</h4>
-                        <p class="text-light mb-0">Bonne journée de travail. Vous avez effectué {{ $nombre_ventes }} ventes aujourd'hui.</p>
+<div class="container-fluid py-4">
+    <!-- En-tête avec infos station -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <div class="d-flex align-items-center">
+                <div class="me-3">
+                    <div class="bg-primary text-white rounded-circle p-3">
+                        <i class="fas fa-gas-pump fa-2x"></i>
                     </div>
-                    <div class="col-md-4 text-end">
-                        <div class="bg-white bg-opacity-25 p-3 rounded">
-                            <h5 class="text-white mb-0">Poste: {{ $user->poste ?? 'Pompiste' }}</h5>
-                            <small class="text-light">Station: {{ $user->station->name ?? 'Principale' }}</small>
+                </div>
+                <div>
+                    <h1 class="h4 mb-1">Bonjour, {{ $user->name  }} !</h1>
+                    
+                    <p class="text-muted mb-0">
+                        <i class="fas fa-map-marker-alt me-1"></i>
+                        
+                        @if(isset($station) && $station)
+                            Station : <strong>{{ $station->name }}</strong>
+                        @else
+                            Station : <strong class="text-warning">Non assignée</strong>
+                        @endif
+                        
+                        | Poste : {{ Auth::user()->roleName }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-primary text-white">
+                <div class="card-body py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-0">Heure actuelle</h6>
+                            <div class="display-6 fw-bold" id="live-clock">{{ now()->format('H:i') }}</div>
+                        </div>
+                        <div class="text-end">
+                            <small>{{ now()->format('d/m/Y') }}</small><br>
+                            <div id="attendance-status" class="badge bg-success">
+                                <i class="fas fa-check-circle me-1"></i> En service
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<!-- Statistiques Employé -->
-<div class="row mb-4">
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title text-muted">Chiffre d'Affaires</h6>
-                        <h3 class="text-success">{{ number_format($ventes_jour, 0, ',', ' ') }} FCFA</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-money-bill-wave fa-2x text-success"></i>
-                    </div>
-                </div>
-                <small class="text-success"><i class="fas fa-arrow-up"></i> Aujourd'hui</small>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title text-muted">Volume Distribué</h6>
-                        <h3 class="text-primary">{{ number_format($volume_vendu, 0, ',', ' ') }} L</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-gas-pump fa-2x text-primary"></i>
-                    </div>
-                </div>
-                <small class="text-primary">{{ $nombre_ventes }} transactions</small>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title text-muted">Commission</h6>
-                        <h3 class="text-warning">{{ number_format($commission_jour, 0, ',', ' ') }} FCFA</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-coins fa-2x text-warning"></i>
-                    </div>
-                </div>
-                <small class="text-warning">Estimation du jour</small>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6 mb-4">
-        <div class="card stat-card">
-            <div class="card-body">
-                <div class="d-flex justify-content-between">
-                    <div>
-                        <h6 class="card-title text-muted">Objectif Quotidien</h6>
-                        <h3 class="text-info">{{ $objectif_atteint }}%</h3>
-                    </div>
-                    <div class="align-self-center">
-                        <i class="fas fa-bullseye fa-2x text-info"></i>
-                    </div>
-                </div>
-                <div class="progress mt-2" style="height: 6px;">
-                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ $objectif_atteint }}%;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Interface de Vente Rapide -->
-<div class="row mb-4">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-bolt me-2"></i>Vente Rapide
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-8">
-                        <form id="quick-sale-form">
-                            <div class="row">
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Type de Carburant</label>
-                                    <select class="form-select" name="fuel_type" required>
-                                        <option value="">Sélectionner...</option>
-                                        <option value="essence">Essence</option>
-                                        <option value="diesel">Diesel</option>
-                                        <option value="kerosene">Kérosène</option>
-                                    </select>
+    <!-- Cartes de statistiques du jour -->
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card border-start-primary h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-primary text-uppercase mb-1">
+                                Ventes aujourd'hui
+                            </div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">
+                                {{ $todayStats['sales_count'] }}
+                            </div>
+                            <div class="mt-2">
+                                @php
+                                    $goalPercentage = $goals['daily_sales'] > 0 
+                                        ? ($todayStats['sales_count'] / $goals['daily_sales']) * 100 
+                                        : 0;
+                                @endphp
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-primary" role="progressbar" 
+                                         style="width: {{ min($goalPercentage, 100) }}%"></div>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Volume (Litres)</label>
-                                    <input type="number" class="form-control" name="volume" placeholder="0" min="1" step="0.5" required>
+                                <small class="text-muted">
+                                    Objectif : {{ $goals['daily_sales'] }} ventes
+                                    ({{ number_format($goalPercentage, 1) }}%)
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card border-start-success h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-success text-uppercase mb-1">
+                                CA du jour
+                            </div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">
+                                {{ number_format($todayStats['total_amount'], 0, ',', ' ') }} FCFA
+                            </div>
+                            <div class="mt-2">
+                                @php
+                                    $amountGoalPercentage = $goals['daily_amount'] > 0 
+                                        ? ($todayStats['total_amount'] / $goals['daily_amount']) * 100 
+                                        : 0;
+                                @endphp
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar bg-success" role="progressbar" 
+                                         style="width: {{ min($amountGoalPercentage, 100) }}%"></div>
                                 </div>
-                                <div class="col-md-4 mb-3">
-                                    <label class="form-label">Montant (FCFA)</label>
-                                    <input type="number" class="form-control" name="amount" placeholder="0" readonly>
+                                <small class="text-muted">
+                                    Objectif : {{ number_format($goals['daily_amount'], 0, ',', ' ') }} FCFA
+                                    ({{ number_format($amountGoalPercentage, 1) }}%)
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-money-bill-wave fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card stat-card border-start-info h-100">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs fw-bold text-info text-uppercase mb-1">
+                                Volume total
+                            </div>
+                            <div class="h5 mb-0 fw-bold text-gray-800">
+                                {{ number_format($todayStats['total_volume'], 2, ',', ' ') }} L
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    Moyenne par vente : 
+                                    {{ number_format($todayStats['average_amount'], 0, ',', ' ') }} FCFA
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-gas-pump fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card sale-card h-100">
+                <div class="card-body">
+                    <div class="text-center">
+                        <h6 class="text-white mb-3">Nouvelle Vente</h6>
+                        <a href="{{ route('employee.sales.create') }}" class="btn btn-light btn-lg w-100">
+                            <i class="fas fa-plus-circle me-2"></i>
+                            Démarrer une vente
+                        </a>
+                        <div class="mt-3 text-white-50">
+                            <small><i class="fas fa-bolt me-1"></i> Rapide et simple</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pompes disponibles et dernières ventes -->
+    <div class="row">
+        <!-- Pompes de la station -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 fw-bold text-primary">
+                        <i class="fas fa-gas-pump me-2"></i>Pompes disponibles
+                    </h6>
+                    <span class="badge bg-primary">{{ $pumps->count() }} pompes</span>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        @foreach($pumps as $pump)
+                        <div class="col-md-6">
+                            <div class="border rounded p-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="p-2 bg-light rounded me-3">
+                                        <i class="fas fa-gas-pump text-primary"></i>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1">Pompe {{ $pump->pump_number }}</h6>
+                                        <small class="text-muted">
+                                            {{ $pump->fuel->name ?? 'N/A' }}
+                                        </small>
+                                        <div class="mt-2">
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-bolt me-1"></i> Disponible
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Mode de Paiement</label>
-                                    <select class="form-select" name="payment_method" required>
-                                        <option value="cash">Espèces</option>
-                                        <option value="card">Carte Bancaire</option>
-                                        <option value="mobile">Mobile Money</option>
-                                        <option value="voucher">Bon d'achat</option>
-                                    </select>
+                        </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dernières ventes -->
+        <div class="col-lg-6 mb-4">
+            <div class="card shadow h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="m-0 fw-bold text-primary">
+                        <i class="fas fa-history me-2"></i>Dernières ventes
+                    </h6>
+                    <a href="{{ route('employee.sales.index') }}" class="btn btn-sm btn-outline-primary">
+                        Voir tout
+                    </a>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                       @forelse($recentSales as $sale)
+                        <div class="list-group-item">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">
+                                        <i class="fas fa-gas-pump text-primary me-2"></i>
+                                        Pompe {{ $sale->pump->pump_number ?? 'N/A' }}
+                                    </h6>
+                                    <small class="text-muted">
+                                        {{ $sale->sale_date->format('H:i') ?? now()->format('H:i') }} | 
+                                        {{ number_format($sale->volume ?? 0, 2, ',', ' ') }}L
+                                    </small>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Pompe</label>
-                                    <select class="form-select" name="pump_id" required>
-                                        <option value="P1">Pompe 1 (Essence)</option>
-                                        <option value="P2">Pompe 2 (Essence)</option>
-                                        <option value="P3">Pompe 3 (Diesel)</option>
-                                        <option value="P4">Pompe 4 (Kérosène)</option>
-                                    </select>
+                                <div class="text-end">
+                                    <strong class="text-success">
+                                        {{ number_format($sale->total_amount ?? 0, 0, ',', ' ') }} FCFA
+                                    </strong>
+                                    <div>
+                                        <small class="badge bg-secondary">
+                                            {{ $sale->payment_method == 'cash' ? '💵 Espèces' : 
+                                            ($sale->payment_method == 'card' ? '💳 Carte' : 
+                                            ($sale->payment_method == 'mobile_money' ? '📱 Mobile Money' : '👤 Compte')) }}
+                                        </small>
+                                    </div>
                                 </div>
                             </div>
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-check me-2"></i>Enregistrer la Vente
+                        </div>
+                        @empty
+                        <div class="list-group-item text-center py-5">
+                            <i class="fas fa-cash-register fa-3x text-muted mb-3"></i>
+                            <p class="text-muted">Aucune vente aujourd'hui</p>
+                            <a href="{{ route('employee.sales.create') }}" class="btn btn-primary">
+                                Faire une première vente
+                            </a>
+                        </div>
+                        @endforelse
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistiques de la semaine -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-white py-3">
+                    <h6 class="m-0 fw-bold text-primary">
+                        <i class="fas fa-chart-line me-2"></i>Performance de la semaine
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <canvas id="weekChart" height="200"></canvas>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 bg-light rounded">
+                                <h6 class="fw-bold">Résumé hebdomadaire</h6>
+                                <div class="mt-3">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Total ventes :</span>
+                                        <strong>{{ $weekStats['sales_count'] ?? 0 }}</strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Chiffre d'affaires :</span>
+                                        <strong class="text-success">
+                                            {{ number_format($weekStats['total_amount'] ?? 0, 0, ',', ' ') }} FCFA
+                                        </strong>
+                                    </div>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Objectif hebdo :</span>
+                                        <strong>{{ $goals['weekly_sales'] ?? 0 }} ventes</strong>
+                                    </div>
+                                    @php
+                                        $weekGoalPercentage = ($goals['weekly_sales'] ?? 0) > 0 
+                                            ? (($weekStats['sales_count'] ?? 0) / ($goals['weekly_sales'] ?? 1)) * 100 
+                                            : 0;
+                                    @endphp
+                                    <div class="progress mt-3" style="height: 10px;">
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                             style="width: {{ min($weekGoalPercentage, 100) }}%">
+                                            {{ number_format($weekGoalPercentage, 1) }}%
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions rapides -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-white py-3">
+                    <h6 class="m-0 fw-bold text-primary">
+                        <i class="fas fa-bolt me-2"></i>Actions rapides
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <a href="{{ route('employee.sales.create') }}" 
+                               class="btn btn-primary w-100 py-3">
+                                <i class="fas fa-cash-register fa-2x mb-2"></i><br>
+                                Nouvelle vente
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('employee.sales.index') }}" 
+                               class="btn btn-info w-100 py-3">
+                                <i class="fas fa-history fa-2x mb-2"></i><br>
+                                Mes ventes
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="{{ route('employee.statistics') }}" 
+                               class="btn btn-success w-100 py-3">
+                                <i class="fas fa-chart-bar fa-2x mb-2"></i><br>
+                                Statistiques
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-warning w-100 py-3" id="quickReportBtn">
+                                <i class="fas fa-clipboard-check fa-2x mb-2"></i><br>
+                                Rapport journalier
                             </button>
-                        </form>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="bg-light p-3 rounded">
-                            <h6 class="text-center">Calcul Automatique</h6>
-                            <hr>
-                            <div class="text-center">
-                                <small class="text-muted">Prix/Litre</small>
-                                <h5 id="price-per-liter">0 FCFA</h5>
-                            </div>
-                            <div class="text-center mt-3">
-                                <small class="text-muted">Total</small>
-                                <h3 id="total-amount" class="text-success">0 FCFA</h3>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -173,146 +359,127 @@
     </div>
 </div>
 
-<!-- Dernières Ventes et Produit Populaire -->
-<div class="row">
-    <div class="col-md-8">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-history me-2"></i>Mes Dernières Ventes
-                </h5>
+<!-- Modal rapport rapide -->
+<div class="modal fade" id="quickReportModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Rapport journalier</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th>Heure</th>
-                                <th>Type</th>
-                                <th>Volume</th>
-                                <th>Montant</th>
-                                <th>Pompe</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($dernieres_ventes as $vente)
-                            <tr>
-                                <td>{{ $vente['heure'] }}</td>
-                                <td>
-                                    <span class="badge
-                                        @if($vente['type'] == 'Essence') bg-primary
-                                        @elseif($vente['type'] == 'Diesel') bg-warning
-                                        @else bg-secondary @endif">
-                                        {{ $vente['type'] }}
-                                    </span>
-                                </td>
-                                <td>{{ $vente['volume'] }} L</td>
-                                <td>{{ number_format($vente['montant'], 0, ',', ' ') }} FCFA</td>
-                                <td>{{ $vente['pompe'] }}</td>
-                                <td><span class="badge bg-success">Terminé</span></td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Ce rapport sera envoyé à votre responsable.
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Statistiques Personnelles -->
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header bg-white">
-                <h5 class="card-title mb-0">
-                    <i class="fas fa-chart-pie me-2"></i>Mes Stats
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="text-center mb-4">
-                    <h6>Produit le Plus Vendu</h6>
-                    <div class="bg-primary text-white p-3 rounded">
-                        <h4>{{ $produit_plus_vendu }}</h4>
-                        <small>42% des ventes</small>
-                    </div>
-                </div>
-
                 <div class="mb-3">
-                    <small class="text-muted">Performance du Mois</small>
-                    <div class="progress" style="height: 10px;">
-                        <div class="progress-bar bg-success" style="width: 85%"></div>
-                    </div>
-                    <small>85% - Excellent</small>
+                    <label class="form-label">Commentaires (optionnel)</label>
+                    <textarea class="form-control" rows="3" 
+                              placeholder="Anomalies, incidents, suggestions..."></textarea>
                 </div>
-
-                <div class="mb-3">
-                    <small class="text-muted">Précision des transactions</small>
-                    <div class="progress" style="height: 10px;">
-                        <div class="progress-bar bg-info" style="width: 92%"></div>
-                    </div>
-                    <small>92% - Très bon</small>
+                <div class="alert alert-light">
+                    <h6>Récapitulatif du jour :</h6>
+                    <ul class="mb-0">
+                        <li>{{ $todayStats['sales_count'] ?? 0 }} ventes effectuées</li>
+                        <li>Chiffre d'affaires : {{ number_format($todayStats['total_amount'] ?? 0, 0, ',', ' ') }} FCFA</li>
+                        <li>Volume total : {{ number_format($todayStats['total_volume'] ?? 0, 2, ',', ' ') }} L</li>
+                    </ul>
                 </div>
-
-                <div class="text-center mt-4">
-                    <button class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-download me-1"></i>Mes Rapports
-                    </button>
-                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary">Envoyer le rapport</button>
             </div>
         </div>
     </div>
 </div>
 @endsection
 
-@section('scripts')
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-$(document).ready(function() {
-    // Mise à jour de l'heure en temps réel
-    function updateTime() {
+document.addEventListener('DOMContentLoaded', function() {
+    // Horloge en temps réel
+    function updateClock() {
         const now = new Date();
-        $('#current-time').text(now.toLocaleTimeString('fr-FR', {
-            hour: '2-digit',
-            minute: '2-digit'
-        }));
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        
+        document.getElementById('live-clock').textContent = `${hours}:${minutes}:${seconds}`;
     }
-    setInterval(updateTime, 60000);
+    
+    setInterval(updateClock, 1000);
+    updateClock();
 
-    // Prix par type de carburant
-    const fuelPrices = {
-        'essence': 750,
-        'diesel': 650,
-        'kerosene': 650
-    };
+    // Graphique de la semaine
+    const weekCtx = document.getElementById('weekChart').getContext('2d');
+    const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+    
+    // Préparer les données
+    const dailyStats = @json($weekStats['daily_stats'] ?? []);
+    const days = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
+        
+    // Préparer les données pour le graphique
+    const dailyData = days.map(day => {
+        return dailyStats[day]?.amount || 0;
+    });
 
-    // Calcul automatique du montant
-    $('select[name="fuel_type"], input[name="volume"]').on('change input', function() {
-        const fuelType = $('select[name="fuel_type"]').val();
-        const volume = parseFloat($('input[name="volume"]').val()) || 0;
-
-        if (fuelType && volume > 0) {
-            const price = fuelPrices[fuelType];
-            const total = price * volume;
-
-            $('#price-per-liter').text(price + ' FCFA');
-            $('input[name="amount"]').val(total);
-            $('#total-amount').text(total.toLocaleString('fr-FR') + ' FCFA');
+    const dailyCount = days.map(day => {
+        return dailyStats[day]?.count || 0;
+    });
+    
+    new Chart(weekCtx, {
+        type: 'bar',
+        data: {
+            labels: days,
+            datasets: [{
+                label: 'Chiffre d\'affaires (FCFA)',
+                data: dailyData,
+                backgroundColor: '#4e73df',
+                borderColor: '#4e73df',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toLocaleString() + ' FCFA';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        afterLabel: function(context) {
+                            const index = context.dataIndex;
+                            return `Nombre de ventes : ${dailyCount[index]}`;
+                        }
+                    }
+                }
+            }
         }
     });
 
-    // Soumission du formulaire de vente
-    $('#quick-sale-form').on('submit', function(e) {
-        e.preventDefault();
-
-        // Simulation d'enregistrement
-        const formData = $(this).serialize();
-        console.log('Vente enregistrée:', formData);
-
-        // Afficher message de succès
-        alert('Vente enregistrée avec succès !');
-        $(this)[0].reset();
-        $('#total-amount').text('0 FCFA');
-        $('#price-per-liter').text('0 FCFA');
+    // Bouton rapport rapide
+    document.getElementById('quickReportBtn')?.addEventListener('click', function() {
+        const modal = new bootstrap.Modal(document.getElementById('quickReportModal'));
+        modal.show();
     });
+
+    // Vérification des pompes (simulation)
+    function checkPumpsStatus() {
+        // Cette fonction pourrait appeler une API pour vérifier l'état des pompes
+        console.log('Vérification des pompes...');
+    }
+
+    // Vérifier toutes les 5 minutes
+    setInterval(checkPumpsStatus, 300000);
 });
 </script>
-@endsection
+@endpush

@@ -247,10 +247,35 @@ Route::middleware(['role:admin'])->prefix('admin')->name('admin.')->group(functi
     Route::get('/dashboard', ManagerDashboardController::class)->name('dashboard');
     // Ajoutez les autres routes ici au fur et à mesure
 });
-    // Employee Routes
-    Route::middleware(['role:employee'])->prefix('employee')->name('employee.')->group(function () {
-    Route::get('/dashboard', EmployeeDashboardController::class)->name('dashboard');
-    // Ajouter d'autres routes employé ici...
+    
+
+// Routes pour l'espace employé
+Route::middleware(['role:employee'])->prefix('employee')->name('employee.')->group(function () {
+    
+    // Dashboard employé
+    Route::get('/dashboard', [EmployeeDashboardController::class, 'index'])->name('dashboard');
+    
+    // Gestion des ventes
+    Route::prefix('sales')->name('sales.')->group(function () {
+        Route::get('/', [EmployeeSaleController::class, 'index'])->name('index'); // Mes ventes
+        Route::get('/create', [EmployeeSaleController::class, 'create'])->name('create'); // Nouvelle vente
+        Route::post('/', [EmployeeSaleController::class, 'store'])->name('store');
+        Route::get('/{sale}', [EmployeeSaleController::class, 'show'])->name('show');
+        Route::get('/{sale}/ticket', [EmployeeSaleController::class, 'ticket'])->name('ticket');
+    });
+    
+    // Statistiques employé
+    Route::get('/statistics', [EmployeeStatisticController::class, 'index'])->name('statistics');
+    
+    // Profil employé
+    Route::get('/profile', [EmployeeProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [EmployeeProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [EmployeeProfileController::class, 'updatePassword'])->name('profile.password');
+    
+    // Horaires et présence
+    Route::get('/schedule', [EmployeeScheduleController::class, 'index'])->name('schedule');
+    Route::post('/clock-in', [EmployeeScheduleController::class, 'clockIn'])->name('clock.in');
+    Route::post('/clock-out', [EmployeeScheduleController::class, 'clockOut'])->name('clock.out');
 });
 
     // Technician Routes

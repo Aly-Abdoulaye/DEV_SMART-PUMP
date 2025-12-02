@@ -62,6 +62,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Station::class, 'manager_id');
     }
+    public function hasStation()
+    {
+        return !is_null($this->station_id);
+    }
 
     public function sales()
     {
