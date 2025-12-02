@@ -51,46 +51,92 @@
         <div class="row">
             <!-- Sidebar -->
             <div class="col-md-3 col-lg-2 sidebar">
-                <div class="text-center py-4">
-                    <h4 class="text-white">SMART PUMP</h4>
-                    <small class="text-muted">Espace Manager</small>
-                </div>
+    <div class="text-center py-4">
+        <h4 class="text-white">SMART PUMP</h4>
+        <small class="text-muted">Espace Manager</small>
+    </div>
 
-                <nav class="nav flex-column">
-                    <a class="nav-link active" href="{{ route('manager.dashboard') }}">
-                        <i class="fas fa-tachometer-alt"></i>Tableau de Bord
-                    </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-gas-pump"></i>Gestion Carburant
-                    </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-shopping-cart"></i>Ventes
-                    </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-money-bill-wave"></i>Dépenses
-                    </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-users"></i>Clients Partenaires
-                    </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-file-invoice"></i>Rapports
-                    </a>
-                    <a class="nav-link" href="#">
-                        <i class="fas fa-cog"></i>Paramètres
-                    </a>
-                    <a class="nav-link" href="{{ route('logout') }}"
-                       onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                        <i class="fas fa-sign-out-alt"></i>Déconnexion
-                    </a>
-                </nav>
+    <nav class="nav flex-column">
+        <a class="nav-link active" href="{{ route('manager.dashboard') }}">
+            <i class="fas fa-tachometer-alt"></i>Tableau de Bord
+            <span class="badge bg-danger float-end mt-1" id="alert-badge">2</span>
+        </a>
+
+        <!-- Carburant -->
+        <a class="nav-link" data-bs-toggle="collapse" href="#collapseFuel">
+            <i class="fas fa-gas-pump"></i>Gestion Carburant
+            <i class="fas fa-chevron-down float-end mt-1"></i>
+        </a>
+        <div class="collapse show" id="collapseFuel">
+            <div class="nav flex-column ps-3">
+                <a class="nav-link small" href="#">Niveaux des cuves</a>
+                <a class="nav-link small" href="#">Achats carburant</a>
+                <a class="nav-link small" href="#">Écarts et anomalies</a>
             </div>
+        </div>
+
+        <!-- Ventes -->
+        <a class="nav-link" data-bs-toggle="collapse" href="#collapseSales">
+            <i class="fas fa-shopping-cart"></i>Ventes
+            <i class="fas fa-chevron-down float-end mt-1"></i>
+        </a>
+        <div class="collapse" id="collapseSales">
+            <div class="nav flex-column ps-3">
+                <a class="nav-link small" href="#">Ventes du jour</a>
+                <a class="nav-link small" href="#">Par employé</a>
+                <a class="nav-link small" href="#">Historique</a>
+            </div>
+        </div>
+
+        <!-- Dépenses -->
+        <a class="nav-link" href="#">
+            <i class="fas fa-money-bill-wave"></i>Dépenses
+            <span class="badge bg-warning float-end mt-1">3 en attente</span>
+        </a>
+
+        <!-- Clients -->
+        <a class="nav-link" href="#">
+            <i class="fas fa-users"></i>Clients Partenaires
+        </a>
+
+        <!-- Communication -->
+        <a class="nav-link" href="#">
+            <i class="fas fa-comments"></i>Messagerie
+            <span class="badge bg-info float-end mt-1">5</span>
+        </a>
+
+        <!-- Rapports -->
+        <a class="nav-link" href="#">
+            <i class="fas fa-file-invoice"></i>Rapports
+        </a>
+
+        <!-- Équipe -->
+        <a class="nav-link" href="#">
+            <i class="fas fa-user-friends"></i>Mon Équipe
+        </a>
+
+        <!-- Paramètres -->
+        <a class="nav-link" href="#">
+            <i class="fas fa-cog"></i>Paramètres
+        </a>
+
+        <hr class="text-white-50 mx-3 my-2">
+
+        <a class="nav-link text-warning" href="{{ route('logout') }}"
+           onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+            <i class="fas fa-sign-out-alt"></i>Déconnexion
+        </a>
+    </nav>
+</div>
 
             <!-- Main Content -->
             <div class="col-md-9 col-lg-10 main-content">
                 <!-- Top Navigation -->
                 <nav class="navbar navbar-expand-lg navbar-light bg-white">
                     <div class="container-fluid">
-                        <span class="navbar-brand">Tableau de Bord Manager</span>
+<button class="btn btn-success btn-sm">
+    <i class="fas fa-lock me-1"></i>Clôturer journée
+</button>
                         <div class="navbar-nav ms-auto">
                             <div class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
